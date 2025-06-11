@@ -25,7 +25,7 @@ def main():
         inst.write('ROUTe:SCAN ON')
         inst.write('ROUTe:LIMI:HIGH 6')
         inst.write('ROUTe:LIMI:LOW 1')
-        inst.write('ROUTe:STARt ON')
+
 
         csv_filename = 'scan_readings.csv'
         with open(csv_filename, 'w', newline='') as csvfile:
@@ -35,7 +35,13 @@ def main():
             start = time.time()
 
             while True:
+
                 elapsed = time.time() - start
+                inst.write('ROUTe:STARt ON')
+                inst.write('ROUTe:COUN 1')
+                print("hey")
+                time.sleep(15)
+                print("hey")
                 readings = []
                 for ch in range(1, 7):
                     resp = inst.query(f'ROUTe:DATA? {ch}')
@@ -44,6 +50,7 @@ def main():
                 print(readings)
                 writer.writerow([f"{elapsed:.3f}"] + readings)
                 csvfile.flush()
+                inst.write('ROUTe:STARt OFF')
                 time.sleep(interval)
 
     except KeyboardInterrupt:
