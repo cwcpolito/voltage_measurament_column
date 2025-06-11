@@ -22,10 +22,12 @@ def main():
 
     try:
         # configure scan
-        inst.write('ROUTe:SCAN ON')
-        inst.write('ROUTe:LIMI:HIGH 6')
-        inst.write('ROUTe:LIMI:LOW 1')
-
+        inst.write('ROUTe:SCAN ON')  # turn on the scanner card :contentReference[oaicite:0]{index=0}
+        inst.write('ROUTe:LIMIt:LOW 1')  # lowest channel in your scan list :contentReference[oaicite:1]{index=1}
+        inst.write('ROUTe:LIMIt:HIGH 6')  # highest channel in your scan list :contentReference[oaicite:2]{index=2}
+        inst.write('ROUTe:FUNCtion SCAN')  # loop through all channels, not just step one :contentReference[oaicite:3]{index=3}
+        inst.write('ROUTe:DELay 0')  # optional inter-channel delay
+        inst.write('ROUTe:COUNt 1')  # one complete pass per trigger :contentReference[oaicite:4]{index=4}
 
         csv_filename = 'scan_readings.csv'
         with open(csv_filename, 'w', newline='') as csvfile:
@@ -37,10 +39,9 @@ def main():
             while True:
 
                 elapsed = time.time() - start
-                inst.write('ROUTe:STARt ON')
-                inst.write('ROUTe:COUN 1')
+                inst.write('ROUTe:STARt ON')  # kick off one scan pass :contentReference[oaicite:5]{index=5}
                 print("hey")
-                time.sleep(15)
+
                 print("hey")
                 readings = []
                 for ch in range(1, 7):
@@ -50,7 +51,6 @@ def main():
                 print(readings)
                 writer.writerow([f"{elapsed:.3f}"] + readings)
                 csvfile.flush()
-                inst.write('ROUTe:STARt OFF')
                 time.sleep(interval)
 
     except KeyboardInterrupt:
