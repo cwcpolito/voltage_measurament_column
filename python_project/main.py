@@ -6,8 +6,8 @@ def main():
     resource_id = 'USB0::0xF4EC::0xEE38::SDM36FAX2R0858::INSTR'
 
     try:
-        interval = float(input("Enter read interval in seconds: ").strip())
-        if interval <= 0:
+        interval = float(input("Enter read interval in seconds greater than 10 seconds: ").strip())
+        if interval < 10:
             raise ValueError
     except ValueError:
         print("Invalid interval; please enter a positive number.")
@@ -32,7 +32,7 @@ def main():
         csv_filename = 'scan_readings.csv'
         with open(csv_filename, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(['Time_s'] + [f'Channel {ch}' for ch in range(1, 7)])
+            writer.writerow(['Time_s'] + [f'Channel {ch}' for ch in range(1, 7)]+['Channel 1 - Channel 2']+['Channel 2 - Channel 3']+['Channel 3 - Channel 4']+['Channel 4 - Channel 5']+['Channel 5 - Channel 6'])
             print(f"\nStarting acquisition every {interval}s. Press Ctrl+C to stop.")
             start = time.time()
 
@@ -40,16 +40,27 @@ def main():
 
                 elapsed = time.time() - start
                 inst.write('ROUTe:STARt ON')  # kick off one scan pass :contentReference[oaicite:5]{index=5}
-                time.sleep(7)
+                time.sleep(10)
                 readings = []
                 for ch in range(1, 7):
                     resp = inst.query(f'ROUTe:DATA? {ch}')
                     val = resp.strip().split()[0]
                     readings.append(val)
-                print(readings)
-                writer.writerow([f"{elapsed:.3f}"] + readings)
+                    # Calcola le differenze
+                diff12 = float(readings[0]) - float(readings[1])
+                diff23 = float(readings[1]) - float(readings[2])
+                diff34 = float(readings[2]) - float(readings[3])
+                diff45 = float(readings[3]) - float(readings[4])
+                diff56 = float(readings[4]) - float(readings[5])
+
+                # Scrivi i dati nel CSV
+                writer.writerow(
+                    [f"{elapsed:.3f}"] +
+                    readings +
+                    [diff12, diff23, diff34, diff45, diff56]
+                    )
                 csvfile.flush()
-                time.sleep(interval)
+                time.sleep(interval-10)
 
     except KeyboardInterrupt:
         print("\nAcquisition stopped by user.")
