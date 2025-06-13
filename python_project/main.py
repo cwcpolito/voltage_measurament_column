@@ -40,9 +40,7 @@ def main():
 
                 elapsed = time.time() - start
                 inst.write('ROUTe:STARt ON')  # kick off one scan pass :contentReference[oaicite:5]{index=5}
-                print("hey")
-
-                print("hey")
+                time.sleep(7)
                 readings = []
                 for ch in range(1, 7):
                     resp = inst.query(f'ROUTe:DATA? {ch}')
